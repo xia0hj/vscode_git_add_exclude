@@ -1,6 +1,11 @@
 import { languageCommentMap } from "@src/regex/matcher";
 import { describe, expect, test } from "vitest";
 
+type LineInfo = {
+  lineNumber: number;
+  text: string;
+};
+
 type FilterParameter = {
   languageId: string;
   textSplitedByLine: string[];
@@ -13,7 +18,7 @@ export function filterByCommentTag({
   languageId,
   startTag,
   endTag,
-}: FilterParameter) {
+}: FilterParameter): { filteredResult: string[]; removedLineList: LineInfo[] } {
   const targetCommentRegex =
     languageCommentMap[languageId] ?? languageCommentMap.default;
 
@@ -46,7 +51,7 @@ export function filterByCommentTag({
   });
 
   if (tagRange.length === 0) {
-    return textSplitedByLine;
+    return { filteredResult: textSplitedByLine, removedLineList: [] };
   }
 
   const mergedRange: number[][] = [tagRange[0]];
@@ -61,58 +66,90 @@ export function filterByCommentTag({
     }
   }
 
-  let result: string[] = [];
-  for (let i = 0; i < mergedRange.length; i++) {
-    const lastEndLine = i === 0 ? -1 : mergedRange[i - 1][1];
-    const curStartLine = mergedRange[i][0];
+  const filteredResult = getFilteredResult(textSplitedByLine, mergedRange);
+  const removedLineList = getRemovedLineList(textSplitedByLine, mergedRange);
+
+  return {
+    filteredResult,
+    removedLineList,
+  };
+}
+
+function getFilteredResult(
+  textSplitedByLine: string[],
+  range: number[][],
+): string[] {
+  let filteredResult: string[] = [];
+  for (let i = 0; i < range.length; i++) {
+    const lastEndLine = i === 0 ? -1 : range[i - 1][1];
+    const curStartLine = range[i][0];
     if (lastEndLine + 1 < curStartLine) {
-      result = result.concat(textSplitedByLine.slice(lastEndLine + 1, curStartLine));
+      filteredResult = filteredResult.concat(
+        textSplitedByLine.slice(lastEndLine + 1, curStartLine),
+      );
     }
   }
 
-  const lastEndLine = mergedRange[mergedRange.length - 1][1];
+  const lastEndLine = range[range.length - 1][1];
   if (lastEndLine + 1 < textSplitedByLine.length) {
-    result = result.concat(
-      textSplitedByLine.slice(lastEndLine + 1, textSplitedByLine.length)
+    filteredResult = filteredResult.concat(
+      textSplitedByLine.slice(lastEndLine + 1, textSplitedByLine.length),
     );
   }
 
-  return result;
+  return filteredResult;
 }
 
-import.meta.vitest && describe('filter.ts', ()=>{
-  test("Test filter", () => {
-    const textSplitedByLine = [
-      "import { filterByCommentTag } from '@src/regex/filter';",
-      "import { suite, test } from 'mocha';",
-      "",
-      "suite('test filter text', function(){",
-      "//@git-add-exclude-start",
-      "console.log('DO NOT COMMIT THIS LINE !!!');",
-      "//@git-add-exclude-end",
-
-      "         //@git-add-exclude-start",
-      "const foo = 1;",
-      "    //@git-add-exclude-start",
-      "const bar = 2;",
-      "//@git-add-exclude-end",
-      "const baz = 3;",
-      "//@git-add-exclude-end",
-      "const qux = 4;",
-    ];
-
-    const languageId = "javascript";
-    const startTag = "@git-add-exclude-start";
-    const endTag = "@git-add-exclude-end";
-
-    const filterResult = filterByCommentTag({
-      textSplitedByLine,
-      languageId,
-      startTag,
-      endTag,
-    });
-
-    expect(filterResult.length).toBe(5);
+function getRemovedLineList(
+  textSplitedByLine: string[],
+  range: number[][],
+): LineInfo[] {
+  const removedLineList: LineInfo[] = [];
+  range.forEach(([tagStartLine, tagEndLine]) => {
+    for (let i = tagStartLine; i <= tagEndLine; i++) {
+      removedLineList.push({
+        lineNumber: i,
+        text: textSplitedByLine[i],
+      });
+    }
   });
+  return removedLineList;
 }
-) 
+
+import.meta.vitest &&
+  describe("filter.ts", () => {
+    test("Test filter", () => {
+      const textSplitedByLine = [
+        "import { filterByCommentTag } from '@src/regex/filter';",
+        "import { suite, test } from 'mocha';",
+        "",
+        "suite('test filter text', function(){",
+        "//@git-add-exclude-start",
+        "console.log('DO NOT COMMIT THIS LINE !!!');",
+        "//@git-add-exclude-end",
+
+        "         //@git-add-exclude-start",
+        "const foo = 1;",
+        "    //@git-add-exclude-start",
+        "const bar = 2;",
+        "//@git-add-exclude-end",
+        "const baz = 3;",
+        "//@git-add-exclude-end",
+        "const qux = 4;",
+      ];
+
+      const languageId = "javascript";
+      const startTag = "@git-add-exclude-start";
+      const endTag = "@git-add-exclude-end";
+
+      const { filteredResult, removedLineList } = filterByCommentTag({
+        textSplitedByLine,
+        languageId,
+        startTag,
+        endTag,
+      });
+
+      expect(filteredResult.length).toBe(5);
+      expect(removedLineList.length).toBe(10);
+    });
+  });

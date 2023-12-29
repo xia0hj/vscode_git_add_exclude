@@ -8,7 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
     ?.exports?.getAPI(1);
   if (gitExtensionApi === undefined) {
     console.warn(
-      "Extension vscode.git-add-exclude failed to activate, can not found dependency vscode.git."
+      "Extension vscode.git-add-exclude failed to activate, can not found dependency vscode.git.",
     );
     return;
   }
@@ -21,13 +21,15 @@ export function activate(context: vscode.ExtensionContext) {
       repositoryWatcher.watchOperationAdd();
       context.subscriptions.push(repositoryWatcher);
       watcherMap.set(repository.rootUri.toString(), repositoryWatcher);
-    }
+    },
   );
   context.subscriptions.push(watchRepositoryOpen);
 
-  const watchRepositoryClose = gitExtensionApi.onDidCloseRepository((repository) => {
-    watcherMap.get(repository.rootUri.toString())?.dispose();
-  });
+  const watchRepositoryClose = gitExtensionApi.onDidCloseRepository(
+    (repository) => {
+      watcherMap.get(repository.rootUri.toString())?.dispose();
+    },
+  );
   context.subscriptions.push(watchRepositoryClose);
 }
 

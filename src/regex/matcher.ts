@@ -51,32 +51,32 @@ export const languageCommentMap: { [languageId: string]: CommentRegex[] } = {
   sql: [CommentDoubleHyphen, CommentBlock],
 } as const;
 
-import.meta.vitest && describe('matcher.ts', ()=>{
-  const tag = "@git-add-exclude-start";
-  test("Test comment //", () => {
-    const douhleSlashRegex = CommentDoubleSlash.buildRegex(tag);
-    expect(douhleSlashRegex.test(`//${tag}`)).toBe(true);
-    expect(douhleSlashRegex.test(`  //   ${tag}  `)).toBe(true);
+import.meta.vitest &&
+  describe("matcher.ts", () => {
+    const tag = "@git-add-exclude-start";
+    test("Test comment //", () => {
+      const douhleSlashRegex = CommentDoubleSlash.buildRegex(tag);
+      expect(douhleSlashRegex.test(`//${tag}`)).toBe(true);
+      expect(douhleSlashRegex.test(`  //   ${tag}  `)).toBe(true);
+    });
+    test("Test comment #", () => {
+      const numberSignRegex = CommentNumberSign.buildRegex(tag);
+      expect(numberSignRegex.test(`#${tag}`)).toBe(true);
+      expect(numberSignRegex.test(`    #    ${tag}   `)).toBe(true);
+    });
+    test("Test comment <!-- -->", () => {
+      const htmlElementRegex = CommentHtmlElement.buildRegex(tag);
+      expect(htmlElementRegex.test(`<!--${tag}-->`)).toBe(true);
+      expect(htmlElementRegex.test(`     <!--    ${tag}  -->`)).toBe(true);
+    });
+    test("Test comment /* */", () => {
+      const blockRegex = CommentBlock.buildRegex(tag);
+      expect(blockRegex.test(`/*${tag}*/`)).toBe(true);
+      expect(blockRegex.test(`     /***  **  ${tag}  */ `)).toBe(true);
+    });
+    test("Test comment --", () => {
+      const doubleHyphenRegex = CommentDoubleHyphen.buildRegex(tag);
+      expect(doubleHyphenRegex.test(`--${tag}`)).toBe(true);
+      expect(doubleHyphenRegex.test(`     --     ${tag}   `)).toBe(true);
+    });
   });
-  test("Test comment #", () => {
-    const numberSignRegex = CommentNumberSign.buildRegex(tag);
-    expect(numberSignRegex.test(`#${tag}`)).toBe(true);
-    expect(numberSignRegex.test(`    #    ${tag}   `)).toBe(true);
-  });
-  test("Test comment <!-- -->", () => {
-    const htmlElementRegex = CommentHtmlElement.buildRegex(tag);
-    expect(htmlElementRegex.test(`<!--${tag}-->`)).toBe(true);
-    expect(htmlElementRegex.test(`     <!--    ${tag}  -->`)).toBe(true);
-  });
-  test("Test comment /* */", () => {
-    const blockRegex = CommentBlock.buildRegex(tag);
-    expect(blockRegex.test(`/*${tag}*/`)).toBe(true);
-    expect(blockRegex.test(`     /***  **  ${tag}  */ `)).toBe(true);
-  });
-  test("Test comment --", () => {
-    const doubleHyphenRegex = CommentDoubleHyphen.buildRegex(tag);
-    expect(doubleHyphenRegex.test(`--${tag}`)).toBe(true);
-    expect(doubleHyphenRegex.test(`     --     ${tag}   `)).toBe(true);
-  });
-}
-) 
