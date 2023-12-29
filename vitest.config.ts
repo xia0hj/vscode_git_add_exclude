@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { defineConfig } from "vitest/config";
 import * as path from "node:path";
 
@@ -6,5 +8,8 @@ export default defineConfig({
     alias: {
       "@src": path.resolve(__dirname, "src"),
     },
+  },
+  test: {
+    includeSource: ["src/**/*.ts"],
   },
 });

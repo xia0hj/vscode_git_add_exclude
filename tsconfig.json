@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "types": ["vitest/importMeta"],
+    "target": "es2020",
     "lib": ["esnext"],
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "resolveJsonModule": true,
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"]

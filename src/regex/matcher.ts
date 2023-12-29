@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 type CommentRegex = {
   buildRegex: (tag: string) => RegExp;
@@ -16,7 +16,7 @@ const CommentNumberSign: CommentRegex = {
 } as const;
 
 const CommentHtmlElement: CommentRegex = {
-  buildRegex: (tag) => RegExp(`^[\\*\\s]*<\!--[\\*\\s]*${tag}[\\*\\s]*-->`),
+  buildRegex: (tag) => RegExp(`^[\\*\\s]*<!--[\\*\\s]*${tag}[\\*\\s]*-->`),
   type: "CommentHtmlElement",
 } as const;
 
@@ -51,7 +51,7 @@ export const languageCommentMap: { [languageId: string]: CommentRegex[] } = {
   sql: [CommentDoubleHyphen, CommentBlock],
 } as const;
 
-if (import.meta.vitest) {
+import.meta.vitest && describe('matcher.ts', ()=>{
   const tag = "@git-add-exclude-start";
   test("Test comment //", () => {
     const douhleSlashRegex = CommentDoubleSlash.buildRegex(tag);
@@ -79,3 +79,4 @@ if (import.meta.vitest) {
     expect(doubleHyphenRegex.test(`     --     ${tag}   `)).toBe(true);
   });
 }
+) 

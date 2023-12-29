@@ -1,5 +1,5 @@
 import { languageCommentMap } from "@src/regex/matcher";
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 type FilterParameter = {
   languageId: string;
@@ -80,7 +80,7 @@ export function filterByCommentTag({
   return result;
 }
 
-if (import.meta.vitest) {
+import.meta.vitest && describe('filter.ts', ()=>{
   test("Test filter", () => {
     const textSplitedByLine = [
       "import { filterByCommentTag } from '@src/regex/filter';",
@@ -115,3 +115,4 @@ if (import.meta.vitest) {
     expect(filterResult.length).toBe(5);
   });
 }
+) 
