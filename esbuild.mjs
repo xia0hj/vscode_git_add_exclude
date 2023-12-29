@@ -10,9 +10,7 @@ const buildOption = {
   minify: true,
   sourcemap: true,
   treeShaking: true,
-  define: {
-    "import.meta.vitest": "undefined",
-  },
+  define: { "import.meta.vitest": "undefined" },
   platform: "node",
   external: ["vscode"],
   format: "cjs",
