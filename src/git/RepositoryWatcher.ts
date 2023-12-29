@@ -1,7 +1,7 @@
 import { filterByCommentTag } from "@src/regex/filter";
-import { type Repository } from "@src/git/git_extension_api";
+import { type Repository } from "@src/git/git";
 import * as vscode from "vscode";
-import * as path from "node:path";
+import { type LineInfo } from "@src/common/type";
 
 export interface RepositoryInternalApi extends Repository {
   repository: {
@@ -33,11 +33,14 @@ export class RepositoryWatcher implements vscode.Disposable {
 
   watchOperationAdd() {
     this.disposable = this.repository.repository.onDidRunOperation(
-      ({ operation }) => {
+      async ({ operation }) => {
         if (operation.kind !== "Add") {
           return;
         }
+
         const config = getExtensionConfig();
+        const unstageFileLineMap = new Map<string, LineInfo[]>();
+
         this.repository.state.indexChanges.forEach(async ({ uri }) => {
           const textDocument = await vscode.workspace.openTextDocument(uri);
           const textSplitedByLine: string[] = [];
@@ -47,25 +50,41 @@ export class RepositoryWatcher implements vscode.Disposable {
             );
             textSplitedByLine.push(lineText);
           }
-          const { filteredResult } = filterByCommentTag({
+          const { stageText, unstageLineList } = filterByCommentTag({
             languageId: textDocument.languageId,
             textSplitedByLine,
             startTag: config.blockStartTag,
             endTag: config.blockEndTag,
           });
-          this.repository.repository.stage(uri, filteredResult.join(""));
+          this.repository.repository.stage(uri, stageText.join(""));
 
-          const removedCount = textSplitedByLine.length - filteredResult.length;
-          if (removedCount > 0) {
-            vscode.window.showInformationMessage(
-              `added file ${path.basename(
-                uri.path,
-              )}, removed ${removedCount} lines.`,
-            );
+          if (unstageLineList.length > 0) {
+            unstageFileLineMap.set(uri.path, unstageLineList);
           }
         });
+
+        this.afterUnstage(unstageFileLineMap);
       },
     );
+  }
+
+  async afterUnstage(unstageFileLineMap: Map<string, LineInfo[]>) {
+    if (unstageFileLineMap.size === 0) {
+      return;
+    }
+    let totalUnstageLineCount = 0;
+    unstageFileLineMap.forEach(
+      (lineList) => (totalUnstageLineCount += lineList.length),
+    );
+    const isShowDetail = await vscode.window.showInformationMessage(
+      `Unstage ${totalUnstageLineCount} lines from ${unstageFileLineMap.size} files.`,
+      "Show detail",
+    );
+    if (isShowDetail == null) {
+      return;
+    }
+
+    // todo 打开一个编辑器展示详情
   }
 
   dispose() {

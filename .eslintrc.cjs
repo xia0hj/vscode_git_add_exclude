@@ -24,8 +24,10 @@ const eslintConfig = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint"],
-  rules: {},
-  ignorePatterns: ["dist"],
+  rules: {
+    "@typescript-eslint/consistent-type-imports": ["error"],
+  },
+  ignorePatterns: ["dist", "git.d.ts"],
 };
 
 module.exports = eslintConfig;

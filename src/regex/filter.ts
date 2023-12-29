@@ -1,10 +1,6 @@
 import { languageCommentMap } from "@src/regex/matcher";
 import { describe, expect, test } from "vitest";
-
-type LineInfo = {
-  lineNumber: number;
-  text: string;
-};
+import { type LineInfo } from "@src/common/type";
 
 type FilterParameter = {
   languageId: string;
@@ -18,7 +14,7 @@ export function filterByCommentTag({
   languageId,
   startTag,
   endTag,
-}: FilterParameter): { filteredResult: string[]; removedLineList: LineInfo[] } {
+}: FilterParameter): { stageText: string[]; unstageLineList: LineInfo[] } {
   const targetCommentRegex =
     languageCommentMap[languageId] ?? languageCommentMap.default;
 
@@ -51,7 +47,7 @@ export function filterByCommentTag({
   });
 
   if (tagRange.length === 0) {
-    return { filteredResult: textSplitedByLine, removedLineList: [] };
+    return { stageText: textSplitedByLine, unstageLineList: [] };
   }
 
   const mergedRange: number[][] = [tagRange[0]];
@@ -66,25 +62,25 @@ export function filterByCommentTag({
     }
   }
 
-  const filteredResult = getFilteredResult(textSplitedByLine, mergedRange);
-  const removedLineList = getRemovedLineList(textSplitedByLine, mergedRange);
+  const stageText = getStageText(textSplitedByLine, mergedRange);
+  const unstageLineList = getUnstageLineList(textSplitedByLine, mergedRange);
 
   return {
-    filteredResult,
-    removedLineList,
+    stageText,
+    unstageLineList,
   };
 }
 
-function getFilteredResult(
+function getStageText(
   textSplitedByLine: string[],
   range: number[][],
 ): string[] {
-  let filteredResult: string[] = [];
+  let stageText: string[] = [];
   for (let i = 0; i < range.length; i++) {
     const lastEndLine = i === 0 ? -1 : range[i - 1][1];
     const curStartLine = range[i][0];
     if (lastEndLine + 1 < curStartLine) {
-      filteredResult = filteredResult.concat(
+      stageText = stageText.concat(
         textSplitedByLine.slice(lastEndLine + 1, curStartLine),
       );
     }
@@ -92,28 +88,28 @@ function getFilteredResult(
 
   const lastEndLine = range[range.length - 1][1];
   if (lastEndLine + 1 < textSplitedByLine.length) {
-    filteredResult = filteredResult.concat(
+    stageText = stageText.concat(
       textSplitedByLine.slice(lastEndLine + 1, textSplitedByLine.length),
     );
   }
 
-  return filteredResult;
+  return stageText;
 }
 
-function getRemovedLineList(
+function getUnstageLineList(
   textSplitedByLine: string[],
   range: number[][],
 ): LineInfo[] {
-  const removedLineList: LineInfo[] = [];
+  const unstageLineList: LineInfo[] = [];
   range.forEach(([tagStartLine, tagEndLine]) => {
     for (let i = tagStartLine; i <= tagEndLine; i++) {
-      removedLineList.push({
+      unstageLineList.push({
         lineNumber: i,
         text: textSplitedByLine[i],
       });
     }
   });
-  return removedLineList;
+  return unstageLineList;
 }
 
 import.meta.vitest &&
@@ -142,14 +138,14 @@ import.meta.vitest &&
       const startTag = "@git-add-exclude-start";
       const endTag = "@git-add-exclude-end";
 
-      const { filteredResult, removedLineList } = filterByCommentTag({
+      const { stageText, unstageLineList } = filterByCommentTag({
         textSplitedByLine,
         languageId,
         startTag,
         endTag,
       });
 
-      expect(filteredResult.length).toBe(5);
-      expect(removedLineList.length).toBe(10);
+      expect(stageText.length).toBe(5);
+      expect(unstageLineList.length).toBe(10);
     });
   });
