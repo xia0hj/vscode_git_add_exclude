@@ -1,4 +1,4 @@
-import { languageCommentMap } from "@src/regex/matcher";
+import { languageCommentMap } from "@src/util/comment_matcher";
 import { describe, expect, test } from "vitest";
 import { type LineInfo } from "@src/common/type";
 

@@ -1,5 +1,5 @@
-import { filterByCommentTag } from "@src/regex/filter";
-import { type Repository } from "@src/git/git";
+import { filterByCommentTag } from "@src/util/filter";
+import { type Repository } from "@src/common/git";
 import * as vscode from "vscode";
 import { type LineInfo } from "@src/common/type";
 
@@ -85,6 +85,14 @@ export class RepositoryWatcher implements vscode.Disposable {
     }
 
     // todo 打开一个编辑器展示详情
+    const textDocment = await vscode.workspace.openTextDocument({
+      language: 'markdown',
+      content: '666'
+    })
+    vscode.window.showTextDocument(textDocment, {
+      viewColumn: vscode.ViewColumn.Beside,
+      preview: true
+    })
   }
 
   dispose() {

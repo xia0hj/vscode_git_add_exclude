@@ -1,5 +1,5 @@
-import { RepositoryWatcher } from "@src/git/RepositoryWatcher";
-import { type GitExtension } from "@src/git/git";
+import { RepositoryWatcher } from "@src/RepositoryWatcher";
+import { type GitExtension } from "@src/common/git";
 import * as vscode from "vscode";
 
 export function activate(context: vscode.ExtensionContext) {
