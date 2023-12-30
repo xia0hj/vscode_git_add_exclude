@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"]

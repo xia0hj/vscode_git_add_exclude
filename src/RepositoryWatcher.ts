@@ -2,6 +2,7 @@ import { filterByCommentTag } from "@src/util/filter";
 import { type Repository } from "@src/common/git";
 import * as vscode from "vscode";
 import { type LineInfo } from "@src/common/type";
+import { convertUnstageInfoToMarkdown } from "@src/util/unstage_info_to_markdown";
 
 export interface RepositoryInternalApi extends Repository {
   repository: {
@@ -84,10 +85,9 @@ export class RepositoryWatcher implements vscode.Disposable {
       return;
     }
 
-    // todo 打开一个编辑器展示详情
     const textDocment = await vscode.workspace.openTextDocument({
       language: 'markdown',
-      content: '666'
+      content: convertUnstageInfoToMarkdown(unstageFileLineMap)
     })
     vscode.window.showTextDocument(textDocment, {
       viewColumn: vscode.ViewColumn.Beside,
