@@ -1,4 +1,4 @@
 export type LineInfo = {
-  lineNumber: number;
-  text: string;
+    lineNumber: number;
+    text: string;
 };

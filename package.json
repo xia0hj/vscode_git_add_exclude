@@ -1,43 +1,43 @@
 {
-  "scripts": {
-    "build": "node esbuild.mjs",
-    "eslint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "prettier": "prettier . --write",
-    "test": "vitest run",
-    "package": "npm run build && vsce package --no-dependencies"
-  },
-  "main": "./dist/extension.cjs",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "publisher": "me",
-  "name": "vscode_git_add_exclude",
-  "displayName": "Git add exclude",
-  "version": "0.0.0",
-  "devDependencies": {
-    "@types/node": "^18.15.0",
-    "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "@vscode/vsce": "^2.22.0",
-    "esbuild": "^0.19.10",
-    "eslint": "^8.56.0",
-    "prettier": "^3.1.1",
-    "typescript": "^5.3.3",
-    "vitest": "^1.1.0"
-  },
-  "repository": {
-    "url": "https://github.com/xia0hj/vscode_git_add_exclude"
-  },
-  "author": {
-    "url": "https://github.com/xia0hj",
-    "name": "xiaohj"
-  },
-  "private": true,
-  "license": "MIT",
-  "packageManager": "pnpm@8.12.1"
+    "scripts": {
+        "build": "node esbuild.mjs",
+        "eslint": "eslint .",
+        "typecheck": "tsc --noEmit",
+        "prettier": "prettier . --write",
+        "test": "vitest run",
+        "package": "npm run build && vsce package --no-dependencies"
+    },
+    "main": "./dist/extension.cjs",
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "publisher": "me",
+    "name": "vscode_git_add_exclude",
+    "displayName": "Git add exclude",
+    "version": "0.0.0",
+    "devDependencies": {
+        "@types/node": "^18.15.0",
+        "@types/vscode": "^1.85.0",
+        "@typescript-eslint/eslint-plugin": "^6.16.0",
+        "@typescript-eslint/parser": "^6.16.0",
+        "@vscode/vsce": "^2.22.0",
+        "esbuild": "^0.19.10",
+        "eslint": "^8.56.0",
+        "prettier": "^3.1.1",
+        "typescript": "^5.3.3",
+        "vitest": "^1.1.0"
+    },
+    "repository": {
+        "url": "https://github.com/xia0hj/vscode_git_add_exclude"
+    },
+    "author": {
+        "url": "https://github.com/xia0hj",
+        "name": "xiaohj"
+    },
+    "private": true,
+    "license": "MIT",
+    "packageManager": "pnpm@8.12.1"
 }
