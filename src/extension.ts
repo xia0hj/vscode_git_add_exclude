@@ -1,5 +1,5 @@
 import { RepositoryWatcher } from "@src/RepositoryWatcher";
-import { type GitExtension } from "@src/common/git";
+import { Repository, type GitExtension } from "@src/common/git";
 import * as vscode from "vscode";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -15,19 +15,29 @@ export function activate(context: vscode.ExtensionContext) {
 
     const watcherMap = new Map<string, RepositoryWatcher>();
 
-    const watchRepositoryOpen = gitExtensionApi.onDidOpenRepository(
-        (repository) => {
-            const repositoryWatcher = new RepositoryWatcher(repository);
-            repositoryWatcher.watchOperationAdd();
-            context.subscriptions.push(repositoryWatcher);
-            watcherMap.set(repository.rootUri.toString(), repositoryWatcher);
-        },
-    );
+    const watchRepository = (repository: Repository) => {
+        const repositoryUri = repository.rootUri.toString();
+        if (watcherMap.has(repositoryUri)) {
+            return;
+        }
+        const repositoryWatcher = new RepositoryWatcher(repository);
+        repositoryWatcher.watchOperationAdd();
+        context.subscriptions.push(repositoryWatcher);
+        watcherMap.set(repositoryUri, repositoryWatcher);
+    };
+
+    if (gitExtensionApi.repositories.length > 0) {
+        gitExtensionApi.repositories.forEach(watchRepository);
+    }
+    const watchRepositoryOpen =
+        gitExtensionApi.onDidOpenRepository(watchRepository);
     context.subscriptions.push(watchRepositoryOpen);
 
     const watchRepositoryClose = gitExtensionApi.onDidCloseRepository(
         (repository) => {
-            watcherMap.get(repository.rootUri.toString())?.dispose();
+            const repositoryUri = repository.rootUri.toString();
+            watcherMap.get(repositoryUri)?.dispose();
+            watcherMap.delete(repositoryUri);
         },
     );
     context.subscriptions.push(watchRepositoryClose);
